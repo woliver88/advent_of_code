@@ -2,16 +2,16 @@ data: read0 `:aoc2024/w6data.txt
 
 all_obs: raze {x,/: where data[x]="#"} each til count data
 sp0: raze raze {x,/: where data[x]="^"} each til count data
-spaces_occupied: enlist starting
+spaces_occupied: enlist sp0
 finished: 0b
 width: count data[0]
 height: count data
 
 find_any: {[sp; direction]
-    $[`u;[find_up sp];
-        `r;[find_right sp];
-        `d;[find_down sp];
-        `l;[find_left sp];
+    $[direction=`u;[:find_up sp];
+        direction=`r;[:find_right sp];
+        direction=`d;[:find_down sp];
+        direction=`l;[:find_left sp];
         [`error]];
 
     };
@@ -100,7 +100,6 @@ find_left: {[sp]
     $[0=count next_obs; [new_sp: (first sp ;0); finished:: 1b];[new_sp: (first sp;next_obs[1]+1)]];
 
     // all visited indexes (excluding starting point)
-    // CHECK THIS
     b:(last[new_sp]) + til (last[sp]-last[new_sp]);
     visited: first[sp],/:b;
 
@@ -110,23 +109,20 @@ find_left: {[sp]
     };
 
 run: {
+
     ct: 0;
     stp: sp0;
     while[not finished;
-        direction_dict:(0;1;2;3)!(`u`r`d`l);
-        direction = direction_dict[ct mod 4];
-        stp: find_any[stp];
-        ct: ct+1
-        ]:
-    show spaces_occupied;
-    
-    //sp2: find_up sp1;
-    //sp3: find_right sp2;
-    //sp4: find_down sp3;
+        direction_dict:0 1 2 3!`u`r`d`l;
+        direction: direction_dict[ct mod 4];
+        stp: find_any[stp; direction];
+        ct: ct+1;
+        ];
+    :spaces_occupied;
+
     };
 
-run[]
+res: run[]
+count distinct res
 
-
-
-//while[finished;next_step...] 
+//4939
